@@ -1,6 +1,6 @@
 '''
 Problema Beecrowd | 1003
-Data: 2026.02.01
+Data: 2026.04.07
 Estudante: Gabriela
 '''
 # Objetivo: somar A e B e seu valor aparecer na variavel SOMA

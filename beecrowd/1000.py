@@ -1,6 +1,6 @@
 '''
 Problema Beecrowd | 1000
-Data: 2026.02.01
+Data: 2026.04.07
 Estudante: Gabriela
 '''
 # Objetivo: fazer com que a mensagem "Hello World!" apareça na tela
