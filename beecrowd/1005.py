@@ -7,7 +7,7 @@ Estudante: Gabriela
 
 # --- ANÁLISE (LIAC) ---
 # Entrada: as duas notas
-# Processamento: soma as duas notas e depois divide por 2
+# Processamento: multiplica as notas pelo peso delas, soma e divide por 11
 # Saída: mostrar media = ...
 
 n1 = float(input())

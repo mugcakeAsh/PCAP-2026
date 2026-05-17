@@ -7,7 +7,6 @@ Estudante: Gabriela
 
 # --- ANÁLISE (LIAC) ---
 # Entrada: a entrada é o raio da esfera
-# Processamento: aplicar a formula do volume na esfera
 # Saída: mostrar o resultado "VOLUME = valor"
 
 R = float(input())
