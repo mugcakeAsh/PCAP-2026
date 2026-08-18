@@ -9,21 +9,39 @@
 
 from telas import titulo, linha
 from adivinhe import jogar_adivinhe
+from ppt import jogar_ppt
 from modulos import ler_opcao
+from placar import salvar_placar, carregar_placar
+
+NOME_DOS_JOGOS = ['Adivinhe o numero', 'Pedra, papel e tesoura', 'Par ou Impar']
+vezes_jogados = carregar_placar()
+
+def mostrar_placar():
+    titulo('PLACAR')
+    for i in range(3):
+        print(NOME_DOS_JOGOS[i] + ': ' + str(vezes_jogados[i]) + 'x')
 
 NOME_DO_DONO = 'ASH'
-OPCOES = ['0', '1']
+OPCOES = ['0', '1', '2']
 
 while True:
     titulo('FLIPERAMA DO ' + NOME_DO_DONO)
     print('1 - Jogo adivinhe o número')
+    print('2 - Jogo pedra, papel e tesoura')
     print('0 - Sair do Fliperama')
     linha()
     opcao = ler_opcao('Escolha uma opção', OPCOES)
 
     if opcao == '0':
-        print('Até a próxima!')
+        mostrar_placar()
+        salvar_placar(vezes_jogado)
+        titulo('Até a próxima!')
         break
-    elif opcao == '1':
+   
+    indice = int(opcao) - 1
+    vezes_jogado[indice] = vezes_jogado[indice] + 1
+
+    if opcao == '1':
         jogar_adivinhe()
-    
+    elif opcao == '2':
+        jogar_ppt()
