@@ -61,5 +61,3 @@ def jogar_ppt():
         titulo('YOU WIN!')
     else:
         titulo('YOU LOSE!')
-
-jogar_ppt()

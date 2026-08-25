@@ -13,7 +13,7 @@ from ppt import jogar_ppt
 from modulos import ler_opcao
 from placar import salvar_placar, carregar_placar
 
-NOME_DOS_JOGOS = ['Adivinhe o numero', 'Pedra, papel e tesoura', 'Par ou Impar']
+NOME_DOS_JOGOS = ['Adivinhe o numero', 'Pedra-papel-tesoura', 'Par ou Impar']
 vezes_jogados = carregar_placar()
 
 def mostrar_placar():
@@ -34,12 +34,12 @@ while True:
 
     if opcao == '0':
         mostrar_placar()
-        salvar_placar(vezes_jogado)
+        salvar_placar(vezes_jogados)
         titulo('Até a próxima!')
         break
    
     indice = int(opcao) - 1
-    vezes_jogado[indice] = vezes_jogado[indice] + 1
+    vezes_jogados[indice] = vezes_jogados[indice] + 1
 
     if opcao == '1':
         jogar_adivinhe()

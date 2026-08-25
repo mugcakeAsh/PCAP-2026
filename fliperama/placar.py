@@ -1,7 +1,7 @@
 from  os.path import exists
 
 ARQUIVO = 'placar.csv'
-NOMES = ['Adivinhe o numero', 'Pedra, papel e tesoura', 'Par ou Impar']
+NOMES = ['Adivinhe o numero', 'Pedra - papel - tesoura', 'Par ou Impar']
 
 def salvar_placar(vezes):
     arquivo = open(ARQUIVO, 'w')
@@ -17,7 +17,7 @@ def carregar_placar():
     arquivo.close()
 
     vezes = []
-    for linha in linhas:
+    for linha_lida in linhas:
         pedacos = linha_lida.strip().split(',')
         vezes.append(int(pedacos[1]))
     return vezes
