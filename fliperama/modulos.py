@@ -1,21 +1,37 @@
 # ==========================
 # Arquivo: modulos.py
 # Disciplina: 2026-PCAP
-# Aula: 20
+# Aula: 23
 # Autor: Gabriela
-# Data: 2026.08.04
-# Conceitos:
+# Conceitos: validacao e reaproveitamento de funcoes
 # ==========================
+
 
 def ler_opcao(mensagem, validas):
     resposta = input(mensagem + ': ').strip()
+
     while resposta not in validas:
-        print('opção inválida! tente novamente')
+        print('Opcao invalida! Tente novamente.')
         resposta = input(mensagem + ': ').strip()
+
     return resposta
 
+
 def ler_numero(mensagem, minimo, maximo):
-    numeros = []
-    for n in range(minimo, maximo + 1):
-        numeros.append(str(n))
-    return int(ler_opcao(mensagem, numeros))
+    numeros_validos = []
+
+    for numero in range(minimo, maximo + 1):
+        numeros_validos.append(str(numero))
+
+    resposta = ler_opcao(mensagem, numeros_validos)
+    return int(resposta)
+
+
+def ler_texto(mensagem):
+    resposta = input(mensagem + ': ').strip()
+
+    while resposta == '':
+        print('Esse campo nao pode ficar vazio.')
+        resposta = input(mensagem + ': ').strip()
+
+    return resposta
