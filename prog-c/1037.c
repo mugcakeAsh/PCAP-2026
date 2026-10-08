@@ -1,0 +1,32 @@
+/*
+Disciplinha: 2026 - PCAP
+Problema: beecrowd 1037 - intervalo
+Autor: Gabriela
+LIAC : le o numero e verifica em qual intervalo ele se 
+encaixa, caso nao se encaixe em nenhum, 
+mostra "fora de intervalo"
+
+*/
+
+
+#include <stdio.h>
+
+int main(){
+    float n;
+
+    scanf("%f", &n);
+
+    if (n >= 0 && n <= 25) {
+        printf("Intervalo [0,25]\n");
+    } else if (n > 25 && n <= 50) {
+        printf("Intervalo (25,50]\n");
+    } else if (n > 50 && n <= 75) {
+        printf("Intervalo (50,75]\n");
+    } else if (n > 75 && n <= 100) {
+        printf("Intervalo (75,100]\n");
+    } else {
+        printf("Fora de intervalo\n");
+    }
+
+    return 0;
+}
