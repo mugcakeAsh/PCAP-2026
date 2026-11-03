@@ -1,4 +1,7 @@
 prog-c/*
 !prog-c/*.c
-fliperama-c/*
-!fliperama-c/*.c
+fliperama-c/fliperama
+fliperama-c/fliperama.exe
+!prog-c/README.md
+__pycache__/
+*.py[cod]
