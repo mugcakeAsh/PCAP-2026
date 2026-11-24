@@ -16,6 +16,7 @@
 #include <fstream>
 #include <iostream>
 #include <limits>
+#include <numeric>
 #include <random>
 #include <string>
 #include <vector>
@@ -99,6 +100,80 @@ void listar(const std::vector<std::string> &apelidos, const std::vector<int> &pa
     }
     for (std::size_t i = 0; i < qtd; i++) {
         std::cout << apelidos[i] << " - " << partidas[i] << " partida(s)\n";
+    }
+}
+
+bool alterar(std::vector<std::string> &apelidos) {
+    titulo("ALTERAR APELIDO");
+    std::string atual;
+    if (!ler_apelido("Apelido atual", atual)) {
+        return false;
+    }
+    const int posicao = buscar(apelidos, atual);
+    if (posicao == -1) {
+        std::cout << "Jogador nao encontrado.\n";
+        return false;
+    }
+
+    std::string novo;
+    if (!ler_apelido("Novo apelido", novo)) {
+        return false;
+    }
+    if (buscar(apelidos, novo) != -1) {
+        std::cout << "Esse apelido ja existe no cadastro.\n";
+        return false;
+    }
+
+    apelidos[posicao] = novo;
+    std::cout << "Apelido alterado para " << novo << ".\n";
+    return true;
+}
+
+bool excluir(std::vector<std::string> &apelidos, std::vector<int> &partidas) {
+    titulo("EXCLUIR JOGADOR");
+    std::string apelido;
+    if (!ler_apelido("Apelido a excluir", apelido)) {
+        return false;
+    }
+    const int posicao = buscar(apelidos, apelido);
+    if (posicao == -1) {
+        std::cout << "Jogador nao encontrado.\n";
+        return false;
+    }
+
+    int confirmar;
+    if (!ler_numero("Excluir " + apelido + "? (1 confirma, 0 cancela)", 0, 1, confirmar)) {
+        return false;
+    }
+    if (confirmar == 0) {
+        std::cout << "Exclusao cancelada.\n";
+        return false;
+    }
+
+    apelidos.erase(apelidos.begin() + posicao);
+    partidas.erase(partidas.begin() + posicao);
+    std::cout << "Jogador excluido.\n";
+    return true;
+}
+
+void mostrar_ranking(const std::vector<std::string> &apelidos, const std::vector<int> &partidas) {
+    titulo("RANKING POR PARTIDAS");
+    const std::size_t qtd = apelidos.size();
+    if (qtd == 0) {
+        std::cout << "O cadastro esta vazio.\n";
+        return;
+    }
+
+    // Ordeno os indices para manter os dois vectors na ordem de cadastro.
+    std::vector<std::size_t> ordem(qtd);
+    std::iota(ordem.begin(), ordem.end(), std::size_t{0});
+    std::stable_sort(ordem.begin(), ordem.end(), [&partidas](std::size_t a, std::size_t b) {
+        return partidas[a] > partidas[b];
+    });
+    for (std::size_t i = 0; i < qtd; i++) {
+        const std::size_t posicao = ordem[i];
+        std::cout << i + 1 << ". " << apelidos[posicao] << " - "
+                  << partidas[posicao] << " partida(s)\n";
     }
 }
 
@@ -252,6 +327,9 @@ void mostrar_menu() {
               << "2 - Cadastrar jogador\n"
               << "3 - Listar jogadores\n"
               << "4 - Quiz de Informatica\n"
+              << "5 - Alterar apelido\n"
+              << "6 - Excluir jogador\n"
+              << "7 - Ranking por partidas\n"
               << "0 - Sair\n";
 }
 
@@ -268,7 +346,7 @@ int main() {
     for (;;) {
         mostrar_menu();
         int opcao;
-        if (!ler_numero("Sua escolha", 0, 4, opcao) || opcao == 0) {
+        if (!ler_numero("Sua escolha", 0, 7, opcao) || opcao == 0) {
             break;
         }
         bool mudou = false;
@@ -287,6 +365,15 @@ int main() {
                 break;
             case 4:
                 mudou = jogar_quiz(apelidos, partidas);
+                break;
+            case 5:
+                mudou = alterar(apelidos);
+                break;
+            case 6:
+                mudou = excluir(apelidos, partidas);
+                break;
+            case 7:
+                mostrar_ranking(apelidos, partidas);
                 break;
         }
         if (mudou && !salvar(apelidos, partidas)) {
