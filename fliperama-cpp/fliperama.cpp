@@ -4,12 +4,14 @@
  * Autor: Gabriela
  * LIAC: A escolha do menu indica se devo cadastrar, listar ou jogar.
  * A posicao do apelido tambem indica qual e o contador daquele jogador.
+ * A partida conta quando o jogador termina o jogo.
  */
 
 #include <algorithm>
 #include <cctype>
 #include <iostream>
 #include <limits>
+#include <random>
 #include <string>
 #include <vector>
 
@@ -90,6 +92,49 @@ void listar(const std::vector<std::string> &apelidos, const std::vector<int> &pa
     }
 }
 
+int escolher_jogador(const std::vector<std::string> &apelidos, const std::vector<int> &partidas) {
+    std::string quem;
+    if (!ler_apelido("Apelido de quem vai jogar", quem)) {
+        return -1;
+    }
+
+    const int posicao = buscar(apelidos, quem);
+    if (posicao == -1) {
+        std::cout << "Cadastre o jogador antes de jogar.\n";
+        return -1;
+    }
+    if (partidas[posicao] == std::numeric_limits<int>::max()) {
+        std::cout << "Esse jogador chegou ao limite de partidas.\n";
+        return -1;
+    }
+    return posicao;
+}
+
+bool jogar_adivinhe(const std::vector<std::string> &apelidos, std::vector<int> &partidas,
+                    std::mt19937 &sorteador) {
+    titulo("ADIVINHE O NUMERO");
+    const int jogador = escolher_jogador(apelidos, partidas);
+    if (jogador == -1) {
+        return false;
+    }
+
+    std::uniform_int_distribution<int> numeros(1, 100);
+    const int segredo = numeros(sorteador);
+    std::cout << "Pensei em um inteiro de 1 a 100.\n";
+    int palpite;
+    std::size_t tentativas = 0;
+    while (ler_numero("Palpite", 1, 100, palpite)) {
+        tentativas++;
+        if (palpite == segredo) {
+            partidas[jogador]++;
+            std::cout << apelidos[jogador] << " acertou em " << tentativas << " tentativa(s).\n";
+            return true;
+        }
+        std::cout << (palpite < segredo ? "Tente um valor maior.\n" : "Tente um valor menor.\n");
+    }
+    return false;
+}
+
 void mostrar_menu() {
     titulo("FLIPERAMA DA " DONO);
     std::cout << "1 - Adivinhe o Numero\n"
@@ -99,6 +144,7 @@ void mostrar_menu() {
 }
 
 int main() {
+    std::mt19937 sorteador(std::random_device{}());
     std::vector<std::string> apelidos;
     std::vector<int> partidas;
     for (;;) {
@@ -109,7 +155,7 @@ int main() {
         }
         switch (opcao) {
             case 1:
-                std::cout << "Adivinhe o Numero\n";
+                jogar_adivinhe(apelidos, partidas, sorteador);
                 break;
             case 2:
                 cadastrar(apelidos, partidas);
