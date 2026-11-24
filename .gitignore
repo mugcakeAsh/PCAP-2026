@@ -5,3 +5,5 @@ fliperama-c/fliperama.exe
 !prog-c/README.md
 __pycache__/
 *.py[cod]
+prog-cpp/*
+!prog-cpp/*.cpp
