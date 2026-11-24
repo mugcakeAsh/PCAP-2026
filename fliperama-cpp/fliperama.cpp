@@ -5,10 +5,14 @@
  * LIAC: A escolha do menu indica se devo cadastrar, listar ou jogar.
  * A posicao do apelido tambem indica qual e o contador daquele jogador.
  * A partida conta quando o jogador termina o jogo.
+ * Cada linha do CSV guarda esse par para a proxima abertura.
  */
 
 #include <algorithm>
 #include <cctype>
+#include <charconv>
+#include <filesystem>
+#include <fstream>
 #include <iostream>
 #include <limits>
 #include <random>
@@ -16,6 +20,7 @@
 #include <vector>
 
 #define DONO "Gabriela"
+constexpr char ARQUIVO[] = "jogadores.csv";
 
 void titulo(const std::string &texto) {
     std::cout << "\n=== " << texto << " ===\n";
@@ -135,6 +140,62 @@ bool jogar_adivinhe(const std::vector<std::string> &apelidos, std::vector<int> &
     return false;
 }
 
+bool carregar(std::vector<std::string> &apelidos, std::vector<int> &partidas) {
+    std::ifstream entrada(ARQUIVO);
+    if (!entrada) {
+        std::error_code erro;
+        return !std::filesystem::exists(ARQUIVO, erro) && !erro;
+    }
+
+    std::string registro;
+    while (std::getline(entrada, registro)) {
+        if (!registro.empty() && registro.back() == '\r') {
+            registro.pop_back();
+        }
+        const auto virgula = registro.find(',');
+        if (virgula == std::string::npos) {
+            return false;
+        }
+
+        const std::string apelido = registro.substr(0, virgula);
+        const char *fim = registro.data() + registro.size();
+        int jogadas;
+        const auto leitura = std::from_chars(registro.data() + virgula + 1, fim, jogadas);
+        if (!apelido_valido(apelido) || leitura.ec != std::errc{} ||
+            leitura.ptr != fim || jogadas < 0) {
+            return false;
+        }
+        apelidos.push_back(apelido);
+        partidas.push_back(jogadas);
+    }
+    return entrada.eof() && !entrada.bad();
+}
+
+bool salvar(const std::vector<std::string> &apelidos, const std::vector<int> &partidas) {
+    // Gravo a nova versao inteira antes de substituir o CSV que ja existe.
+    const std::string novo_arquivo = std::string(ARQUIVO) + ".novo";
+    std::ofstream saida(novo_arquivo);
+    if (!saida) {
+        return false;
+    }
+
+    const std::size_t qtd = apelidos.size();
+    for (std::size_t i = 0; i < qtd; i++) {
+        saida << apelidos[i] << ',' << partidas[i] << '\n';
+    }
+    saida.close();
+
+    std::error_code erro;
+    if (saida) {
+        std::filesystem::rename(novo_arquivo, ARQUIVO, erro);
+        if (!erro) {
+            return true;
+        }
+    }
+    std::filesystem::remove(novo_arquivo, erro);
+    return false;
+}
+
 void mostrar_menu() {
     titulo("FLIPERAMA DA " DONO);
     std::cout << "1 - Adivinhe o Numero\n"
@@ -147,23 +208,41 @@ int main() {
     std::mt19937 sorteador(std::random_device{}());
     std::vector<std::string> apelidos;
     std::vector<int> partidas;
+    if (!carregar(apelidos, partidas)) {
+        std::cerr << "Nao consegui ler o cadastro em " << ARQUIVO << ".\n";
+        return 1;
+    }
+    std::cout << "Jogadores carregados: " << apelidos.size() << ".\n";
+
     for (;;) {
         mostrar_menu();
         int opcao;
         if (!ler_numero("Sua escolha", 0, 3, opcao) || opcao == 0) {
             break;
         }
+        bool mudou = false;
         switch (opcao) {
             case 1:
-                jogar_adivinhe(apelidos, partidas, sorteador);
+                mudou = jogar_adivinhe(apelidos, partidas, sorteador);
                 break;
-            case 2:
+            case 2: {
+                const auto antes = apelidos.size();
                 cadastrar(apelidos, partidas);
+                mudou = apelidos.size() != antes;
                 break;
+            }
             case 3:
                 listar(apelidos, partidas);
                 break;
         }
+        if (mudou && !salvar(apelidos, partidas)) {
+            std::cerr << "Nao consegui salvar a ultima mudanca.\n";
+            return 1;
+        }
+    }
+    if (!salvar(apelidos, partidas)) {
+        std::cerr << "Nao consegui salvar o cadastro ao sair.\n";
+        return 1;
     }
     std::cout << "\nAte a proxima!\n";
 }
