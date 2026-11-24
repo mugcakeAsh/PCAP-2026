@@ -80,6 +80,10 @@ void cadastrar(std::vector<std::string> &apelidos, std::vector<int> &partidas) {
     if (!ler_apelido("Apelido", novo)) {
         return;
     }
+    if (buscar(apelidos, novo) != -1) {
+        std::cout << "Esse apelido ja existe no cadastro.\n";
+        return;
+    }
     apelidos.push_back(novo);
     partidas.push_back(0);
     std::cout << "Cadastro feito para " << novo << ".\n";
@@ -162,7 +166,7 @@ bool carregar(std::vector<std::string> &apelidos, std::vector<int> &partidas) {
         int jogadas;
         const auto leitura = std::from_chars(registro.data() + virgula + 1, fim, jogadas);
         if (!apelido_valido(apelido) || leitura.ec != std::errc{} ||
-            leitura.ptr != fim || jogadas < 0) {
+            leitura.ptr != fim || jogadas < 0 || buscar(apelidos, apelido) != -1) {
             return false;
         }
         apelidos.push_back(apelido);
