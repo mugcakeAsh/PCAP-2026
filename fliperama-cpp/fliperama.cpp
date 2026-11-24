@@ -9,6 +9,7 @@
  */
 
 #include <algorithm>
+#include <array>
 #include <cctype>
 #include <charconv>
 #include <filesystem>
@@ -144,6 +145,51 @@ bool jogar_adivinhe(const std::vector<std::string> &apelidos, std::vector<int> &
     return false;
 }
 
+struct Pergunta {
+    const char *enunciado;
+    std::array<const char *, 3> alternativas;
+    int correta;
+};
+
+bool jogar_quiz(const std::vector<std::string> &apelidos, std::vector<int> &partidas) {
+    titulo("QUIZ DE INFORMATICA");
+    const int jogador = escolher_jogador(apelidos, partidas);
+    if (jogador == -1) {
+        return false;
+    }
+
+    // Sao as perguntas do Quiz de Informatica da versao em Python.
+    const std::array<Pergunta, 3> perguntas{{
+        {"Qual componente executa as instrucoes do computador?", {"Teclado", "Processador", "Monitor"}, 2},
+        {"Qual e a extensao de um arquivo Python?", {".jpg", ".py", ".mp3"}, 2},
+        {"Qual comando mostra uma mensagem na tela?", {"print", "input", "randint"}, 1},
+    }};
+    int acertos = 0;
+    for (const Pergunta &pergunta : perguntas) {
+        std::cout << '\n' << pergunta.enunciado << '\n';
+        const int alternativas = static_cast<int>(pergunta.alternativas.size());
+        for (int i = 0; i < alternativas; i++) {
+            std::cout << i + 1 << " - " << pergunta.alternativas[i] << '\n';
+        }
+
+        int resposta;
+        if (!ler_numero("Resposta", 1, alternativas, resposta)) {
+            return false;
+        }
+        if (resposta == pergunta.correta) {
+            acertos++;
+            std::cout << "Resposta correta!\n";
+        } else {
+            std::cout << "Resposta correta: " << pergunta.alternativas[pergunta.correta - 1] << ".\n";
+        }
+    }
+
+    partidas[jogador]++;
+    std::cout << "Total de acertos: " << acertos << " de " << perguntas.size() << ".\n";
+    titulo(acertos >= 2 ? "VOCE VENCEU O QUIZ!" : "TENTE OUTRA VEZ!");
+    return true;
+}
+
 bool carregar(std::vector<std::string> &apelidos, std::vector<int> &partidas) {
     std::ifstream entrada(ARQUIVO);
     if (!entrada) {
@@ -205,6 +251,7 @@ void mostrar_menu() {
     std::cout << "1 - Adivinhe o Numero\n"
               << "2 - Cadastrar jogador\n"
               << "3 - Listar jogadores\n"
+              << "4 - Quiz de Informatica\n"
               << "0 - Sair\n";
 }
 
@@ -221,7 +268,7 @@ int main() {
     for (;;) {
         mostrar_menu();
         int opcao;
-        if (!ler_numero("Sua escolha", 0, 3, opcao) || opcao == 0) {
+        if (!ler_numero("Sua escolha", 0, 4, opcao) || opcao == 0) {
             break;
         }
         bool mudou = false;
@@ -237,6 +284,9 @@ int main() {
             }
             case 3:
                 listar(apelidos, partidas);
+                break;
+            case 4:
+                mudou = jogar_quiz(apelidos, partidas);
                 break;
         }
         if (mudou && !salvar(apelidos, partidas)) {
