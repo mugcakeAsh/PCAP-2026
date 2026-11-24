@@ -7,3 +7,5 @@ __pycache__/
 *.py[cod]
 prog-cpp/*
 !prog-cpp/*.cpp
+fliperama-cpp/fliperama
+fliperama-cpp/fliperama.exe
